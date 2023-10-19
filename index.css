@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    display: grid;
+    grid-template-areas: 
+    'header header header'
+    'pieces player2 moves'
+    'pieces main moves'
+    'pieces player1 moves'
+    'footer footer footer';
+}
+
+header {
+    grid-area: header;
+    background-color: red;
+}
+
+#pieces {
+    grid-area: pieces;
+}
+
+#player2 {
+    grid-area: player2;
+}
+
+main {
+    grid-area: main;
+    background-color: gold;
+}
+
+#player1 {
+    grid-area: player1;
+}
+
+#moves {
+    grid-area: moves;
+}
+
+.sidebar {
+    background-color: blue;
+}
+
+.player_info {
+    background-color: darkmagenta;
+}
+
+footer {
+    grid-area: footer;
+    background-color: green;
+}
