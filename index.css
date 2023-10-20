@@ -1,34 +1,51 @@
+/* Course: SENG 513 */
+/* Date: OCT 16, 2023 */
+/* Assignment 1 */
+/* Name: Arne Jarred Michael Hilao */
+/* UCID: 30069573 */
+
 body {
     margin: 0;
     display: grid;
+    grid-template-columns: 25vw 40vw 25vw;
     grid-template-areas: 
     'header header header'
     'pieces player2 moves'
     'pieces main moves'
-    'pieces player1 moves'
-    'footer footer footer';
+    'pieces player1 moves';
+    background-color: #363636;
+    column-gap: 5vw;
 }
 
 header {
     grid-area: header;
-    background-color: red;
+    display: flex;
+    justify-content: space-around;
+    background-color: #232323;
+    height: 50px;
+    margin-bottom: 15px;
+    font-size: 32px;
 }
 
 #pieces {
     grid-area: pieces;
+    margin-left: 5vw;
 }
 
 #player2 {
     grid-area: player2;
+    margin-bottom: 10px;
 }
 
 main {
     grid-area: main;
-    background-color: gold;
+    width: 40vw;
+    height: 40vw;
 }
 
 #player1 {
     grid-area: player1;
+    margin-top: 10px;
 }
 
 #moves {
@@ -36,14 +53,27 @@ main {
 }
 
 .sidebar {
-    background-color: blue;
+    background-color: #242424;
+    width: 20vw;
+    /*border: 5px solid #111;*/
 }
 
 .player_info {
-    background-color: darkmagenta;
+    background-color: #232323;
+    height: 45px;
+    width: 40vw;
 }
 
-footer {
-    grid-area: footer;
-    background-color: green;
+.white {
+    float: left;
+    width: 5vw;
+    height: 5vw;
+    background-color: #f0d9b7;
+}
+
+.black {
+    float: left;
+    width: 5vw;
+    height: 5vw;
+    background-color: #b48767;
 }
