@@ -15,11 +15,21 @@
 
     <body>
         <header>
-            <section id="timer">TIMER</section>
-            <section id="score">SCORE</section>
+            <section id="timer">
+                <section class="timer_container p1_timer">
+                    <section class="timer_digits">
+                        <span id="minutes_1">10</span>:<span id="seconds_1">00</span>
+                    </section>
+                </section>
+                
+                <section class="timer_container p2_timer">
+                    <section class="timer_digits">
+                        <span id="minutes_2">10</span>:<span id="seconds_2">00</span>
+                    </section>
+                </section>
+            </section>
+            <section id="score">PLAYER 1 [ 1 : 1 ] PLAYER 2</section>
         </header>
-
-        <section class="sidebar" id="pieces">PIECES</section>
 
         <section class="player_info" id="player2">PLAYER 2</section>
 
@@ -107,6 +117,13 @@
 
         <section class="player_info" id="player1">PLAYER 1</section>
 
-        <section class="sidebar" id="moves">MOVES</section>
+        <section class="moves">
+            <h1>MOVES</h1>
+
+            <ol>
+                <li>e4 | e5</li>
+                <li>Nf3 | Nf6</li>
+            </ol>
+        </section>
     </body>
 </html>

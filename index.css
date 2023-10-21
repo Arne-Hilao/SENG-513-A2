@@ -4,71 +4,84 @@
 /* Name: Arne Jarred Michael Hilao */
 /* UCID: 30069573 */
 
+html {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
 body {
     margin: 0;
     display: grid;
-    grid-template-columns: 25vw 40vw 25vw;
+    grid-template-columns: 60vw 35vw;
     grid-template-areas: 
-    'header header header'
-    'pieces player2 moves'
-    'pieces main moves'
-    'pieces player1 moves';
+    'header header'
+    'player2 moves'
+    'main moves'
+    'player1 moves';
     background-color: #363636;
     column-gap: 5vw;
+    color: #f9f9f9;
 }
 
 header {
     grid-area: header;
     display: flex;
-    justify-content: space-around;
     background-color: #232323;
     height: 50px;
     margin-bottom: 15px;
     font-size: 32px;
 }
 
-#pieces {
-    grid-area: pieces;
-    margin-left: 5vw;
+#timer {
+    margin-left: 15vw;
+    width: 40vw;
+}
+
+#score {
+    margin-left: 10vw;
 }
 
 #player2 {
     grid-area: player2;
     margin-bottom: 10px;
+    margin-left: 15vw;
 }
 
 main {
     grid-area: main;
     width: 40vw;
     height: 40vw;
+    margin-left: 15vw;
 }
 
 #player1 {
     grid-area: player1;
     margin-top: 10px;
+    margin-left: 15vw;
 }
 
-#moves {
-    grid-area: moves;
-}
-
-.sidebar {
+.moves {
     background-color: #242424;
-    width: 20vw;
+    width: calc(30vw - 30px);
+    padding: 15px;
+    grid-area: moves;
     /*border: 5px solid #111;*/
 }
 
 .player_info {
     background-color: #232323;
     height: 45px;
-    width: 40vw;
+    width: calc(40vw - 20px);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 10px;
 }
 
 .white {
     float: left;
     width: 5vw;
     height: 5vw;
-    background-color: #f0d9b7;
+    background-color: #f0d9d9;
 }
 
 .black {
@@ -76,4 +89,28 @@ main {
     width: 5vw;
     height: 5vw;
     background-color: #b48767;
+}
+
+#timer {
+    display: flex;
+    gap: 10px;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+}
+
+.timer_container {
+    display: flex;
+    margin: 0 auto;
+    color: #000000;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFFFFF;
+}
+
+.timer_digits {
+    font-size: 2rem;
+    font-weight: bold;
 }
