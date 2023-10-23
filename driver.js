@@ -4,7 +4,33 @@
 /* Name: Arne Jarred Michael Hilao */
 /* UCID: 30069573 */
 
-//Check for Promotion
+//sets which player is white. Player 1 = 0, Player 2 = white
+var board = {
+    //object of all white pieces with their corresponding position
+    white: {},
+    //object of all black pieces with their corresponding position
+    black: {}
+};
+
+let whitePlayer = 0;
+
+var setUpBoard = () => {
+    //Set up the board. Move pieces back to their proper places.
+}
+
+var getMoves = () => {
+    //Look at current board state, and return all possible moves for chosen square
+}
+
+var boundCheck = (i, j) => {
+    //check if position (i, j) is in the board
+}
+
+//Box click event
+
+//on Check, highlight the king's square.
+
+//Unhide the promotion menu, when piece reaches the end
 
 //MAKE MOVE
 //      -Important functions to implement for Make move
@@ -24,8 +50,8 @@
 //              -Stalemate happens when a king can't move, but is not in check
 //      -Check for Draw
 //          -Happens when there are only two kings
-//          -Also happens when there is only 1 bishop or 1 knight on one side
-//          -Happens when 50 kign moves in a row happen (not implemented)
+//          -Also happens when there is only 1 bishop or 1 knight on one side (not implemented)
+//          -Happens when 50 king moves in a row happen (not implemented)
 //          -Happens when a position is reached 3 times (not implemented)
 //          -Happens when the draw button is pressed and confirmed.
 //      -Switch Active Player

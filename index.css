@@ -14,9 +14,9 @@ body {
     grid-template-columns: 60vw 35vw;
     grid-template-areas: 
     'header header'
-    'player2 moves'
-    'main moves'
-    'player1 moves';
+    'player2 sidebar'
+    'main sidebar'
+    'player1 sidebar';
     background-color: #363636;
     column-gap: 5vw;
     color: #f9f9f9;
@@ -59,11 +59,14 @@ main {
     margin-left: 15vw;
 }
 
-.moves {
+.sidebar {
+    display: grid;
+    grid-template-rows: 75fr 25fr;
+    flex-direction: column;
     background-color: #242424;
     width: calc(30vw - 30px);
     padding: 15px;
-    grid-area: moves;
+    grid-area: sidebar;
     /*border: 5px solid #111;*/
 }
 
@@ -78,17 +81,17 @@ main {
 }
 
 .white {
-    float: left;
-    width: 5vw;
-    height: 5vw;
     background-color: #f0d9d9;
 }
 
 .black {
+    background-color: #b48767;
+}
+
+.box {
     float: left;
     width: 5vw;
     height: 5vw;
-    background-color: #b48767;
 }
 
 #timer {
@@ -110,6 +113,12 @@ main {
     background-color: #FFFFFF;
 }
 
+.p2_timer {
+    color: #FFFFFF;
+    background-color: #000000;
+    border: 1px solid #FFFFFF;
+}
+
 .timer_digits {
     font-size: 2rem;
     font-weight: bold;
@@ -117,4 +126,31 @@ main {
 
 img {
     width: 100%;
+}
+
+.moves {
+    height: 75%;
+}
+
+.controls {
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+li {
+    font-size: 1.5em;
+}
+
+button {
+    color: #232323;
+    background-color: #f9f9f9;
+    padding: 0rem 1.5rem;
+}
+
+.controls button {
+    padding: 1.5rem 1.5rem;
+    font-size: 1.5em;
 }
