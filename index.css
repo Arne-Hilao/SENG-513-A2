@@ -144,6 +144,7 @@ img {
 .moves {
     padding: 2vw;
     height: 25vw;
+    text-align: center;
 }
 
 ::-webkit-scrollbar {
@@ -162,10 +163,10 @@ background: #666;
 background: #333;
 }
 
-ol {
-    padding-left: 3vw;
+.movelist {
     height: 20vw;
     overflow-y: scroll;
+    list-style-type: none;
 }
 
 .controls {
