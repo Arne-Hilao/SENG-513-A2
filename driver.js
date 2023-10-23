@@ -4,64 +4,118 @@
 /* Name: Arne Jarred Michael Hilao */
 /* UCID: 30069573 */
 
+//=================GLOBAL VARIABLES=================
+
 //sets which player is white. Player 1 = 0, Player 2 = white
-var board = {
+let whitePlayer = 0;
+
+//sets the currently active player
+let activePlayer = 0;
+
+//board object that the game will reference.
+const board = {
     //object of all white pieces with their corresponding position
-    white: {},
+    //white: {},
     //object of all black pieces with their corresponding position
-    black: {}
+    //black: {}
+
+    //format:
+    //e4: wp
+        //wp means 'white pawn'. First letter denotes color, second denotes piece
+        //w = white, b = black
+        //p = pawn, r = rook, n = knight, b = bishop, q = queen, k = king
 };
 
-let whitePlayer = 0;
+//=================TIMER FUNCTIONS=================
+
+const whiteTimer = {
+    //chess timer
+    //minutes: the number of minutes the player has
+    //seconds: the number of
+}
+
+const blackTimer = {
+    //chess timer
+    //minutes: the number of minutes the player has
+    //seconds: the number of
+}
+
+var startTimer = () => {
+    //starts the timer for the current active player
+}
+
+var stopTimer = () => {
+    //stops the both timers
+}
+
+var resetTimer = () => {
+    //resets the timer to its default 10 mins each
+}
+
+//=================SETUP FUNCTIONS=================
 
 var setUpBoard = () => {
     //Set up the board. Move pieces back to their proper places.
+    //revert the board state to the default
 }
 
-var getMoves = () => {
-    //Look at current board state, and return all possible moves for chosen square
+//=================STATE/GAME FUNCTIONS=================
+
+var checkState = () => {
+    //first, check if the active king is in check
+
+        //if so, check if there are any legal moves for the active player
+            //if not, trigger win
+            //if there are, disallow every other move
+
+    //if the king isn't in check, check for stalemate
+        //check if there are any legal moves for the active player
+            //if not, trigger stalemate
+            //if so, do nothing
+
+    //check the move list for the past few moves. If the past 50 are king moves, draw
+}
+
+var endGame = () => {
+    //check if argument is 0.
+    //if zero, add 0.5 to both scores
+
+    //if not, 
+    //add 1 to active player's score
+
+    //then
+    //set active player to white
+    //make whitePlayer be the inverse of its value
+}
+
+//=================MOVE FUNCTIONS=================
+
+var getMoves = (i, j) => {
+    //Look at the indicated square
+    //check current active player's piece list
+    //if no piece is found, it's an invalid piece
+
+    //if a piece is found, check board state.
+    //If board state doesn't return a check, 
+        //then return all possible moves for chosen piece
+    //If board state returns a check, check all possible moves for chosen piece,
+        //and return list of moves that prevent the check.
+
+    //If move is legal, add to move list
 }
 
 var boundCheck = (i, j) => {
     //check if position (i, j) is in the board
 }
 
-//Box click event
+var highlightMoves = ( moveArray ) => {
+    //highlight the squares for the moves given
+}
 
-//on Check, highlight the king's square.
+var addToList = (activePlayer) => {
+    //add move to the move list
 
-//Unhide the promotion menu, when piece reaches the end
+    //if the activePlayer is white, add a new entry on move
 
-//MAKE MOVE
-//      -Important functions to implement for Make move
-//      -Check Legal Move
-//          -Check on Move
-//          -Reveal moves on right click
-//      -Check Capture
-//          -Check on move to remove captured piece
-//      -Add Move to Move List
-//          -Add to li if bool:white is true. Add new li if false
-//      -Check for Checkmate
-//          -If checkmate, add 1 to active player score
-//          -Switch Player Sides (Player 1 becomes player 2)
-//              -Flip bool: active_player. so wins get added to the correct score
-//      -Check for Stalemate
-//          -If stalemate, add 0.5 to both scores
-//              -Stalemate happens when a king can't move, but is not in check
-//      -Check for Draw
-//          -Happens when there are only two kings
-//          -Also happens when there is only 1 bishop or 1 knight on one side (not implemented)
-//          -Happens when 50 king moves in a row happen (not implemented)
-//          -Happens when a position is reached 3 times (not implemented)
-//          -Happens when the draw button is pressed and confirmed.
-//      -Switch Active Player
-//          -If all checks are passed, switch active player
-
-//TIMER
-//      -Check for end.
-//          -If time is finished, consider win for non-active player
-
-/**
- * Game flow:
- * 
- */
+    //if the activePlayer is black, take the previous move entry, and append ' | (move)'
+}
