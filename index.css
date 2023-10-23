@@ -26,9 +26,10 @@ header {
     grid-area: header;
     display: flex;
     background-color: #232323;
-    height: 50px;
+    height: 70px;
     margin-bottom: 15px;
     font-size: 32px;
+    align-items: center;
 }
 
 #timer {
@@ -141,7 +142,14 @@ img {
 }
 
 .moves {
-    height: 75%;
+    padding: 2vw;
+    height: 25vw;
+}
+
+ol {
+    padding-left: 3vw;
+    height: 20vw;
+    overflow-y: scroll;
 }
 
 .controls {
