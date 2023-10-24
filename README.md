@@ -2,7 +2,9 @@
 Github repository for assignment 2 of CPSC SENG 513
 
 ATTRIBUTION:
-Pieces used are from the iconic CBurnett chess pieces set, under the https://creativecommons.org/licenses/by-sa/3.0/ license. No changes were made to the pieces themselves.
+Disclaimer, the chess pieces are not owned by me and are not copyrighted by me. They are from the CBurnett chess piece set, used under the https://creativecommons.org/licenses/by-sa/3.0/deed.en license. No changes were made to the pieces themselves.
+
+link: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
 
 Author: Arne Jarred Michael A. Hilao
 UCID:   30069573
