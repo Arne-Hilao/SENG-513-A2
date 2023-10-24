@@ -1,6 +1,9 @@
 # SENG-513-A2
 Github repository for assignment 2 of CPSC SENG 513
 
+ATTRIBUTION:
+Pieces used are from the iconic CBurnett chess pieces set, under the https://creativecommons.org/licenses/by-sa/3.0/ license. No changes were made to the pieces themselves.
+
 Author: Arne Jarred Michael A. Hilao
 UCID:   30069573
 
@@ -21,5 +24,5 @@ RULES:      - Players take their turns (starting with white) to move their piece
             - The players can draw when the game goes into stalemate. That is, when the king is not in check, but no other moves can be played.
             - It can also end in a draw when the draw button is clicked, and then confirmed.
             - It can also happens when there are only two kings
-            
+
 MECHANICS:  Players take turns to move their pieces. They may play without a timer, pressing play on the timer at the top of the screen, or without one. Players must first click the piece they wish to move, which will highlight the legal moves, and then click on one of the highlighted squares to move the piece there. Clicking on the piece selected, or clicking on a different piece cancels the selection.

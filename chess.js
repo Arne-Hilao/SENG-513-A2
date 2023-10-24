@@ -6,6 +6,7 @@
 
 //=================GLOBAL VARIABLES=================
 
+/*
 //sets which player is white. Player 1 = 0, Player 2 = white
 let whitePlayer = 0;
 
@@ -119,3 +120,4 @@ var addToList = (activePlayer) => {
 
     //if the activePlayer is black, take the previous move entry, and append ' | (move)'
 }
+*/
