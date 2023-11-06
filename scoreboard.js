@@ -1,3 +1,9 @@
+/* Course: SENG 513 */
+/* Date: OCT 16, 2023 */
+/* Assignment 1 */
+/* Name: Arne Jarred Michael Hilao */
+/* UCID: 30069573 */
+
 class Scoreboard {
     p1score = 0;
     p2score = 0;
