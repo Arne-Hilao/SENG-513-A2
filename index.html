@@ -1,8 +1,13 @@
-<!‐‐ Course: SENG 513 ‐‐>
-<!‐‐ Date: OCT 16, 2023 ‐‐>
-<!‐‐ Assignment 2 ‐‐>
-<!‐‐ Name: Arne Jarred Michael Hilao ‐‐>
-<!‐‐ UCID: 30069573 ‐‐>
+<!--Course: SENG 513-->
+<!--Date: OCT 16, 2023 ‐‐>
+<!--Assignment 2-->
+<!--Name: Arne Jarred Michael Hilao‐‐>
+<!-- UCID: 30069573-->
+
+<!--ATTRIBUTION:-->
+<!--Disclaimer, the chess pieces are not owned by me and are not copyrighted by me. They are from the CBurnett chess piece set, used under the https://creativecommons.org/licenses/by-sa/3.0/deed.en license. No changes were made to the pieces themselves.-->
+
+<!--link: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces-->
 
 <!DOCTYPE html>
 
@@ -11,12 +16,7 @@
         <title>Off-Chess.com - This is not Chess.com</title>
         <link rel="stylesheet" type="text/css" href="./index.css">
         <link rel="icon" type="image" href="./src/wp.png">
-        <script defer src="./pieces.js"></script>
-        <script defer src="./board.js"></script>
-        <script defer src="./scoreboard.js"></script>
-        <script defer src="./moveList.js"></script>
-        <script defer src="./timer.js"></script>
-        <script defer src="./driver.js"></script>
+        <script src="./driver.js"></script>
     </head>
 
     <body>
@@ -38,14 +38,7 @@
                     </section>
                 </section>
             </section>
-            
-            <section class="score">
-                <p>PLAYER 1 [ </p>
-                <p id="p1score">0</p>
-                <p> : </p>
-                <p id="p2score">0</p>
-                <p>] PLAYER 2</p>
-            </section>
+            <section id="score">PLAYER 1 [ 1 : 1 ] PLAYER 2</section>
         </header>
 
         <section class="player_info" id="player2">PLAYER 2</section>
@@ -106,10 +99,10 @@
             <div class="box white" id="b3"> </div>
             <div class="box black" id="c3"> </div>
             <div class="box white" id="d3"> </div>
-            <div class="box black" id="e3"> </div>
+            <div class="box black" id="e3"></div>
             <div class="box white" id="f3"> </div>
-            <div class="box black" id="g3"> </div>
-            <div class="box white" id="h3"> </div>
+            <div class="box black" id="h3"></div>
+            <div class="box white" id="a3"></div>
 
             <!-- Row 2 -->
             <div class="box white" id="a2"> <img src="./src/wp.png"> </div>
@@ -138,7 +131,7 @@
             <section class="moves">
                 <h1>MOVES</h1>
 
-                <ul id="movelist">
+                <ul>
                     <li><h2>WHITE</h2></li>
                     <li><h2>BLACK</h2></li>
                     <li>e4</li>
@@ -150,9 +143,9 @@
             </section>
 
             <section class="controls">
-                <h1 id="activePlayer">ACTIVE PLAYER: WHITE</h1>
-                <button onclick="endGame(0)">DRAW</button>
-                <button onclick="endGame(2)">RESIGN</button>
+                <h1>ACTIVE PLAYER: BLACK</h1>
+                <button>DRAW</button>
+                <button>RESIGN</button>
             </section>
         </section>
     </body>
