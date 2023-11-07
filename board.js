@@ -7,13 +7,16 @@
 //handles board logic, and move logic.
 class Board {
     constructor() {
-        this.whitePieces = {};
-        this.blackPieces = {};
+        this.whitePieces = [];
+        this.blackPieces = [];
     }
 
     //gets all pieces
     getAllPieces = () => {
-        return this.whitePieces.concat(this.blackPieces);
+        return {
+            white: this.whitePieces,
+            black: this.blackPieces
+        }
     }
 
     //get all white pieces
@@ -28,7 +31,13 @@ class Board {
 
     //Resets the board and moves pieces back to their proper places.
     setUpBoard = () => {
-        
+        //create pawns
+        for (let i = 0; i < 8; i++) {
+            let j = new Pawn("Pawn", "white", "a");
+            let h = new Pawn("Pawn", "black", "h");
+            this.whitePieces.push(j);
+            this.blackPieces.push(h);
+        }
     }
 
     checkState = () => {

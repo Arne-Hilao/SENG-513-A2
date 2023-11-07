@@ -1,9 +1,3 @@
-/* Course: SENG 513 */
-/* Date: OCT 16, 2023 */
-/* Assignment 1 */
-/* Name: Arne Jarred Michael Hilao */
-/* UCID: 30069573 */
-
 class Scoreboard {
     p1score = 0;
     p2score = 0;
@@ -13,15 +7,15 @@ class Scoreboard {
         this.p2score = 0;
     }
 
-    getP1Score() {
+    getP1Score = () => {
         return this.p1score;
     }
 
-    getP2Score() {
+    getP2Score = () => {
         return this.p2score;
     }
 
-    incrementScore(player, draw) {
+    incrementScore = (player, draw) => {
         if (draw) {
             this.p1score += 0.5;
             this.p2score += 0.5;
@@ -29,11 +23,10 @@ class Scoreboard {
 
         else {
             if (player === 0) {
-                //player 1 has won, increment their score
+                //player 1 has won
                 this.p1score += 1;
             }
             else if (player === 1) {
-                //player 2 won, increment their score
                 this.p2score += 1;
             }
         }
