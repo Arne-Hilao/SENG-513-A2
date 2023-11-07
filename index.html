@@ -11,7 +11,12 @@
         <title>Off-Chess.com - This is not Chess.com</title>
         <link rel="stylesheet" type="text/css" href="./index.css">
         <link rel="icon" type="image" href="./src/wp.png">
-        <script src="./driver.js"></script>
+        <script defer src="./pieces.js"></script>
+        <script defer src="./board.js"></script>
+        <script defer src="./scoreboard.js"></script>
+        <script defer src="./moveList.js"></script>
+        <script defer src="./timer.js"></script>
+        <script defer src="./driver.js"></script>
     </head>
 
     <body>
@@ -33,7 +38,14 @@
                     </section>
                 </section>
             </section>
-            <section id="score">PLAYER 1 [ 1 : 1 ] PLAYER 2</section>
+            
+            <section class="score">
+                <p>PLAYER 1 [ </p>
+                <p id="p1score">0</p>
+                <p> : </p>
+                <p id="p2score">0</p>
+                <p>] PLAYER 2</p>
+            </section>
         </header>
 
         <section class="player_info" id="player2">PLAYER 2</section>
@@ -94,10 +106,10 @@
             <div class="box white" id="b3"> </div>
             <div class="box black" id="c3"> </div>
             <div class="box white" id="d3"> </div>
-            <div class="box black" id="e3"></div>
+            <div class="box black" id="e3"> </div>
             <div class="box white" id="f3"> </div>
-            <div class="box black" id="h3"></div>
-            <div class="box white" id="a3"></div>
+            <div class="box black" id="g3"> </div>
+            <div class="box white" id="h3"> </div>
 
             <!-- Row 2 -->
             <div class="box white" id="a2"> <img src="./src/wp.png"> </div>
@@ -126,7 +138,7 @@
             <section class="moves">
                 <h1>MOVES</h1>
 
-                <ul>
+                <ul id="movelist">
                     <li><h2>WHITE</h2></li>
                     <li><h2>BLACK</h2></li>
                     <li>e4</li>
@@ -138,9 +150,9 @@
             </section>
 
             <section class="controls">
-                <h1>ACTIVE PLAYER: BLACK</h1>
-                <button>DRAW</button>
-                <button>RESIGN</button>
+                <h1 id="activePlayer">ACTIVE PLAYER: WHITE</h1>
+                <button onclick="endGame(0)">DRAW</button>
+                <button onclick="endGame(2)">RESIGN</button>
             </section>
         </section>
     </body>
