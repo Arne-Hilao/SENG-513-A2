@@ -8,6 +8,11 @@ html {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
 body {
     margin: 0;
     display: grid;
