@@ -6,6 +6,8 @@
 
 //=================GLOBAL VARIABLES=================
 
+let columns = 'abcdefgh'
+
 //sets which player is white. Player 1 = 0, Player 2 = white
 let whitePlayer = 0;
 
@@ -15,9 +17,9 @@ let activePlayer = 0;
 //board object that the game will reference.
 const board = {
     //object of all white pieces with their corresponding position
-    //white: {},
+    white: {},
     //object of all black pieces with their corresponding position
-    //black: {}
+    black: {}
 
     //format:
     //e4: wp
@@ -56,7 +58,191 @@ var resetTimer = () => {
 
 var setUpBoard = () => {
     //Set up the board. Move pieces back to their proper places.
-    //revert the board state to the default
+    //revert the board state to empty
+
+    for (i = 0; i < 8; i++) {
+        for (j = 1; j < 9; j++) {
+            let coord = columns[i];
+            coord = coord.concat(j);
+            delete board.white[coord];
+            delete board.black[coord];
+        }    
+    }
+
+    //set up the pawns
+    for (i = 0; i < 8; i++) {
+        let coord = columns[i];
+        whiteCoord = coord.concat('2')
+        blackCoord = coord.concat('7')
+        board.white[whiteCoord] = 'p';
+        board.black[blackCoord] = 'p';
+    }
+
+    //setup the rooks
+    board.white.a1 = 'r';
+    board.white.h1 = 'r';
+    board.black.a8 = 'r';
+    board.black.h8 = 'r';
+
+    //setup the knights
+    board.white.b1 = 'n';
+    board.white.g1 = 'n';
+    board.black.b8 = 'n';
+    board.black.g8 = 'n';
+
+    //setup the bishops
+    board.white.c1 = 'b';
+    board.white.f1 = 'b';
+    board.black.c8 = 'b';
+    board.black.f8 = 'b';
+
+    //setup the queens
+    board.white.d1 = 'q';
+    board.black.d8 = 'q';
+
+    //setup the kings
+    board.white.e1 = 'k';
+    board.black.e8 = 'k';
+
+    //add event listeners to all boxes
+    let boxes = document.querySelectorAll('.box');
+    boxes.forEach((box) => {
+        box.addEventListener('click', (event) => {
+            clickHandler(event);
+        })
+    })
+}
+
+/**
+ * Function updateBoard
+ * Input: None
+ * 
+ * Function that updates the visual representation of the board.
+ * Called after every modification to the game state, such as selecting pieces, or making moves
+ */
+var updateBoard = () => {
+    //clear board
+    for (i = 0; i < 8; i++) {
+        for (j = 1; j < 9; j++) {
+            let column = columns[i];
+            let coord = column.concat(j);
+
+            document.getElementById(coord).innerHTML = "";
+            document.getElementById(coord).classList.remove('highlighted');
+            document.getElementById(coord).classList.remove('selected');
+            document.getElementById(coord).classList.remove('check');
+        }
+    }
+
+    let whiteCoords = [];
+    let blackCoords = [];
+    
+    for (var coord in board.white) {
+        whiteCoords.push(coord);
+    }
+    for (var coord in board.black) {
+        blackCoords.push(coord);
+    }
+
+    while (whiteCoords?.length) {
+        //take every property in board.whiet and find the element id associated
+        let coord = whiteCoords.pop();
+        let piece = '<img ';
+        if (board.white[coord] === 'p') {
+            piece = piece.concat('src="./src/wp.png"');
+        }
+        else if (board.white[coord] === 'r'){
+            piece = piece.concat('src="./src/wr.png"');
+        }
+        else if (board.white[coord] === 'n'){
+            piece = piece.concat('src="./src/wn.png"');
+        }
+        else if (board.white[coord] === 'b'){
+            piece = piece.concat('src="./src/wb.png"');
+        }
+        else if (board.white[coord] === 'q'){
+            piece = piece.concat('src="./src/wq.png"');
+        }
+        else if (board.white[coord] === 'k'){
+            piece = piece.concat('src="./src/wk.png"');
+        }
+
+        piece = piece.concat('>');
+        document.getElementById(coord).innerHTML = piece;
+    }
+
+    while (blackCoords?.length) {
+        //take every property in board.black and find the element id associated
+        let coord = blackCoords.pop();
+        let piece = '<img ';
+        if (board.black[coord] === 'p') {
+            piece = piece.concat('src="./src/bp.png"');
+        }
+        else if (board.black[coord] === 'r'){
+            piece = piece.concat('src="./src/br.png"');
+        }
+        else if (board.black[coord] === 'n'){
+            piece = piece.concat('src="./src/bn.png"');
+        }
+        else if (board.black[coord] === 'b'){
+            piece = piece.concat('src="./src/bb.png"');
+        }
+        else if (board.black[coord] === 'q'){
+            piece = piece.concat('src="./src/bq.png"');
+        }
+        else if (board.black[coord] === 'k'){
+            piece = piece.concat('src="./src/bk.png"');
+        }
+
+        piece = piece.concat('>');
+        document.getElementById(coord).innerHTML = piece;
+    }
+}
+
+//click listener. handles game logic
+var clickHandler = (event) => {
+    let square, selected;
+    if (event.target.nodeName === "IMG") {
+        //clicking on a piece
+        //get the id of the box it is in
+        square = event.target.parentNode.id;
+    }
+    else {
+        //clicking on an empty square
+        square = event.target.id;
+    }
+
+    //check if a piece is already selected
+    for (i = 0; i < 8; i++) {
+        for (j = 1; j < 8; j++) {
+            let column = columns[i];
+            let coord = column.concat(j)
+            if (document.getElementById(coord).classList.contains('selected')) {
+                //a piece is selected
+                selected = true;
+            }
+        }
+    }
+
+    if (board.white.hasOwnProperty(square)) {
+        //white has it.
+        if (document.getElementById(square).classList.contains('selected')) {
+            //clicked element is already selected
+            document.getElementById(square).classList.remove('selected');
+            selected = false;
+        }
+        else {
+            //clicked element is not selected
+            if (selected) {
+                document.getElementsByClassName('selected')[0].classList.remove('selected');
+            }
+            document.getElementById(square).classList.add('selected');
+        }
+    }
+    else {
+        selected = false;
+        document.getElementsByClassName('selected')[0].classList.remove('selected');
+    }
 }
 
 //=================STATE/GAME FUNCTIONS=================
@@ -119,3 +305,6 @@ var addToList = (activePlayer) => {
 
     //if the activePlayer is black, take the previous move entry, and append ' | (move)'
 }
+
+window.onload = setUpBoard();
+window.onload = updateBoard();
