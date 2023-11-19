@@ -249,7 +249,7 @@ var clickHandler = (event) => {
         let moves = getMoves(type, clicked);
 
         //fitler based off state (read: check)
-        moves = filterCheck(moves);
+        moves = filterCheck(clicked, moves, type);
 
         highlightMoves(moves);
         element.classList.add('selected');
@@ -298,8 +298,14 @@ var clickHandler = (event) => {
 
 //=================STATE/GAME FUNCTIONS=================
 
-var filterCheck = () => {
-    
+var filterCheck = (original, moves, piece) => {
+    console.log(original);
+    console.log(moves);
+    console.log(piece);
+    for (move in moves) {
+        let tBoard = board;
+
+    }
 }
 
 var checkState = () => {
@@ -347,8 +353,18 @@ var endGame = (arg) => {
 
     //then
     //set active player to white
+    activePlayer = 'white'
     
     //make whitePlayer be the inverse of its value
+    if (whitePlayer) {
+        whitePlayer = 0;
+    }
+    else {
+        whitePlayer = 1;
+    }
+
+    //reset board
+    setUpBoard();
 }
 
 var checkOccupied = (coord, pawn) => {
@@ -438,8 +454,6 @@ var makeMove = (original, clicked, type) => {
         board[activePlayer][type].push(clicked);
     }
 
-    //remove old piece
-
     //swap activePlayer
     if (activePlayer === 'white') {
         activePlayer = 'black';
@@ -476,6 +490,9 @@ var makeMove = (original, clicked, type) => {
 
     //update board
     updatePieces();
+
+    //check for checkmate
+    checkState();
 }
 
 //gets an unfiltered set of moves
