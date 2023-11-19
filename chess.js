@@ -13,6 +13,7 @@ let whitePlayer = 0;
 
 //sets the currently active player
 let activePlayer = 'white';
+let inactivePlayer = 'black'
 
 let wKingMoved = false;
 let bKingMoved = false;
@@ -95,11 +96,12 @@ var clickHandler = (event) => {
 
         //get all possible moves
         let moves = getMoves(type, clicked);
+        console.log(moves);
 
         //fitler based off state (read: check)
-        //moves = filterCheck(clicked, moves, type);
+        let filteredMoves = filterCheck(clicked, moves, type);
 
-        highlightMoves(moves);
+        highlightMoves(filteredMoves);
         element.classList.add('selected');
         //select the selected piece
     }
@@ -145,28 +147,224 @@ var clickHandler = (event) => {
 }
 
 var filterCheck = (original, moves, piece) => {
-    console.log(original);
-    console.log(moves);
-    console.log(piece);
-    for (move in moves) {
-        let tBoard = board;
+    //make a new temporary board state for every move, and then filter the moves
+    //using checkState();
+    let curatedMoves = moves.filter((move) => {
+        let tBoard = structuredClone(board);
+        console.log(tBoard);
+        boardMove(original, move, piece, tBoard);
+        return !checkState(tBoard);
+    });
 
-    }
+    console.log(curatedMoves);
+    return curatedMoves;
 }
 
-var checkState = () => {
-    //first, check if the active king is in check
+var checkState = (boardObject) => {
+    //determine if the king is in check
+    let found = false;
+    
+    //check for knights threatening the king
 
-    //find the king's position in the active player's board
+    let c = columns.indexOf(boardObject[activePlayer].king[0]);
+    let row = Number(boardObject[activePlayer].king[1]);
 
-        //if so, check if there are any legal moves for the active player
-            //if not, trigger win
-            //if there are, disallow every other move
+    if (c < 6) {
+        coord = columns[c+2];
+        if (row < 8 && boardObject[inactivePlayer].knight.includes(coord.concat(row + 1))) {
+            //check for a knight
+            found = true;
+        }
+        if (row > 1 && boardObject[inactivePlayer].knight.includes(coord.concat(row - 1))) {
+            //check for a knight
+            found = true;
+        }
+    }
+    if (c > 1) {
+        coord = columns[c-2];
+        if (row < 8 && boardObject[inactivePlayer].knight.includes(coord.concat(row + 1))) {
+            //check for a knight
+            found = true;
+        }
+        if (row > 1 && boardObject[inactivePlayer].knight.includes(coord.concat(row - 1))) {
+            //check for a knight
+            found = true;
+        }
+    }
+    if (c < 7) {
+        coord = columns[c+1];
+        if (row < 7 && boardObject[inactivePlayer].knight.includes(coord.concat(row + 2))) {
+            //check for a knight
+            found = true;
+        }
+        if (row > 2 && boardObject[inactivePlayer].knight.includes(coord.concat(row -2))) {
+            //check for a knight
+            found = true;
+        }
+    }
+    if (c > 0) {
+        coord = columns[c-1];
+        if (row < 7 && boardObject[inactivePlayer].knight.includes(coord.concat(row + 2))) {
+            //check for a knight
+            found = true;
+        }
+        if (row > 2 && boardObject[inactivePlayer].knight.includes(coord.concat(row -2))) {
+            //check for a knight
+            found = true;
+        }
+    }
 
-    //if the king isn't in check, check for stalemate
-        //check if there are any legal moves for the active player
-            //if not, trigger stalemate
-            //if so, do nothing
+    c = columns.indexOf(boardObject[activePlayer].king[0]);
+    row = Number(boardObject[activePlayer].king[1]);
+
+    //check for pawns threatening the king
+    if (activePlayer === 'white') {
+        //check upper left and upper right diagonals
+        if (c > 0 && row < 8) {
+            coord = columns[c-1].concat(row+1);
+            if (boardObject[inactivePlayer].pawn.includes(coord)) {
+                console.log(coord + 'pawn');
+                found = true;
+            }
+        }
+        if (c < 7 && row < 8) {
+            coord = columns[c+1].concat(row+1);
+            if (boardObject[inactivePlayer].pawn.includes(coord)) {
+                console.log(coord + 'pawn');
+                found = true;
+            }
+        }
+    }
+    else {
+        //check lower left and lower right diagonals
+        if (c > 0 && row > 1) {
+            coord = columns[c-1].concat(row-1);
+            if (boardObject[inactivePlayer].pawn.includes(coord)) {
+                console.log(coord + 'pawn');
+                found = true;
+            }
+        }
+        if (c < 7 && row > 1) {
+            coord = columns[c+1].concat(row-1);
+            if (boardObject[inactivePlayer].pawn.includes(coord)) {
+                console.log(coord + 'pawn');
+                found = true;
+            }
+        }
+    }
+
+    c = columns.indexOf(boardObject[activePlayer].king[0]);
+    row = Number(boardObject[activePlayer].king[1]);
+
+    //check along row for rooks or queens
+    for (let i = row+1; i < 9; i++) {
+        coord = columns[c].concat(i);
+        if (boardObject[inactivePlayer].rook.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+            found = true;
+            break;
+        }
+        else if (checkOccupied(coord, false, boardObject)) {
+            console.log('occupied');
+            break;
+        }
+    }
+    for (let i = row-1; i > 1; i--) {
+        coord = columns[c].concat(i);
+        if (boardObject[inactivePlayer].rook.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+            found = true;
+            break;
+        }
+        else if (checkOccupied(coord, false, boardObject)) {
+            break;
+        }
+    }
+    //highlight along the row
+    for (let i = c+1; i < 8; i++) {
+        coord = columns[i].concat(row);
+        if (boardObject[inactivePlayer].rook.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+            found = true;
+            break;
+        }
+        else if (checkOccupied(coord, false, boardObject)) {
+            break;
+        }
+    }
+    for (let i = c-1; i > 0; i--) {
+        coord = columns[i].concat(row);
+        if (boardObject[inactivePlayer].rook.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+            found = true;
+            break;
+        }
+        else if (checkOccupied(coord, false, boardObject)) {
+            break;
+        }
+    }
+
+    //check along diagonals for bishops or queens
+    let i = c-1;
+        let j = row + 1;
+        while(i >= 0 && j <= 8) {
+            coord = columns[i].concat(j);
+            if (boardObject[inactivePlayer].bishop.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+                found = true;
+                break;
+            }
+            if (checkOccupied(coord, false, boardObject)) {
+                break;
+            }
+            i--;
+            j++;
+        }
+
+        //top right
+        i = c+1;
+        j = row + 1;
+        while(i <= 7 && j <= 8) {
+            coord = columns[i].concat(j);
+            if (boardObject[inactivePlayer].bishop.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+                found = true;
+                break;
+            }
+            if (checkOccupied(coord, false, boardObject)) {
+                break;
+            }
+            i++;
+            j++;
+        }
+
+        //bottom left
+        i = c-1;
+        j = row - 1;
+        while(i >= 0 && j >= 1) {
+            coord = columns[i].concat(j);
+            if (boardObject[inactivePlayer].bishop.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+                found = true;
+                break;
+            }
+            if (checkOccupied(coord, true, boardObject)) {
+                break;
+            }
+            i--;
+            j--;
+        }
+
+        //bottom right
+        i = c+1;
+        j = row - 1;
+        while(i <= 7 && j >= 1) {
+            coord = columns[i].concat(j);
+            if (boardObject[inactivePlayer].bishop.includes(coord) || boardObject[inactivePlayer].queen.includes(coord)) {
+                found = true;
+                break;
+            }
+            if (checkOccupied(coord, true, boardObject)) {
+                break;
+            }
+            i++;
+            j--;
+        }
+
+    return found;
 }
 
 var updateScore = () => {

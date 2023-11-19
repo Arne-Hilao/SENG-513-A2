@@ -6,40 +6,20 @@
 
 //=================MOVE FUNCTIONS=================
 
+//adjusts boardState based on given parameters
 var makeMove = (original, clicked, type) => {
-    //add new item to clicked
-    console.log("Making move:\n original: " + original + "\n clicked: " + clicked + "\n type: " + type);
-
-    //remove clicked position from entire board
-    for (let p in board[activePlayer]) {
-        if (p !== 'king') {
-            board.white[p] = board.white[p].filter((pos) => {
-                return pos !== clicked;
-            })
-            board.black[p] = board.black[p].filter((pos) => {
-                return pos !== clicked;
-            })
-        }
-    }
-
-    //place moved piece
-    if (type === 'king') {
-        board[activePlayer][type] = clicked;
-    }
-    else {
-        board[activePlayer][type] = board[activePlayer][type].filter((pos) => {
-            return pos !== original;
-        })
-        board[activePlayer][type].push(clicked);
-    }
+    
+    boardMove(original, clicked, type, board);
 
     //swap activePlayer
     if (activePlayer === 'white') {
         activePlayer = 'black';
+        inactivePlayer = 'white';
         document.getElementById('active_player').innerHTML = "ACTIVE PLAYER: BLACK"
     }
     else {
         activePlayer = 'white';
+        inactivePlayer = 'black';
         document.getElementById('active_player').innerHTML = "ACTIVE PLAYER: WHITE"
     }
     
@@ -70,12 +50,78 @@ var makeMove = (original, clicked, type) => {
     //update board
     updatePieces();
 
-    //check for checkmate
-    checkState();
+    //check for check
+    if (checkState(board)) {
+        //current king is in check
+        document.getElementById(board[activePlayer].king).classList.add('check')
+
+        //if in check, look for valid moves
+        //if none are found, declare winner
+    }
+}
+
+//updates a given board
+var boardMove = (original, clicked, type, {white, black}) => {
+    //add new item to clicked
+
+    //remove clicked position from entire board
+    if (activePlayer === 'white') {
+        for (let p in white) {
+            if (p !== 'king') {
+                white[p] = white[p].filter((pos) => {
+                    return pos !== clicked;
+                })
+                black[p] = black[p].filter((pos) => {
+                    return pos !== clicked;
+                })
+            }
+        }
+    }
+    else {
+        for (let p in black) {
+            if (p !== 'king') {
+                black[p] = black[p].filter((pos) => {
+                    return pos !== clicked;
+                })
+                black[p] = black[p].filter((pos) => {
+                    return pos !== clicked;
+                })
+            }
+        }
+    }
+    
+
+    console.log('boardMove: ' + white);
+
+    //place move piece
+    if (activePlayer === 'white') {
+        if (type === 'king') {
+            console.log('moving king');
+            white[type] = clicked;
+        }
+        else {
+            white[type] = white[type].filter((pos) => {
+                return pos !== original;
+            })
+            white[type].push(clicked);
+        }
+    }
+    else {
+        if (type === 'king') {
+            black[type] = clicked;
+        }
+        else {
+            black[type] = black[type].filter((pos) => {
+                return pos !== original;
+            })
+            black[type].push(clicked);
+        }
+    }
 }
 
 //gets an unfiltered set of moves
 var getMoves = (piece, pos) => {
+    
     //Look at the indicated square
     let column = pos[0];
     let row = Number(pos[1]);
@@ -93,12 +139,12 @@ var getMoves = (piece, pos) => {
         let c = columns.indexOf(column);
         if (activePlayer === 'white') {
             //only allow a pawn to move twice if it's on its starting square
-            if (!checkOccupied(column.concat(row + 1), true)) {
+            if (!checkOccupied(column.concat(row + 1), true, board)) {
                 coord = column.concat(row + 1);
                 moves.push(coord);
             }
             if (row === 2) {
-                if (!checkOccupied(column.concat(row + 2), true)) {
+                if (!checkOccupied(column.concat(row + 2), true, board)) {
                     coord = column.concat(row + 2);
                     moves.push(coord);
                 }
@@ -107,25 +153,25 @@ var getMoves = (piece, pos) => {
             //check upper left and upper right diagonals
             if (c > 0 && row < 8) {
                 coord = columns[c-1].concat(row+1);
-                if (checkOccupied(coord, true)) {
+                if (checkOccupied(coord, true, board)) {
                     moves.push(coord);
                 }
             }
             if (c < 7 && row < 8) {
                 coord = columns[c+1].concat(row+1);
-                if (checkOccupied(coord, true)) {
+                if (checkOccupied(coord, true, board)) {
                     moves.push(coord);
                 }
             }
         }
         else {
             //only allow a pawn to move twice if it's on its starting square
-            if (!checkOccupied(column.concat(row - 1), true)) {
+            if (!checkOccupied(column.concat(row - 1), true, board)) {
                 coord = column.concat(row - 1);
                 moves.push(coord);
             }
             if (row === 7) {
-                if (!checkOccupied(column.concat(row - 2), true)) {
+                if (!checkOccupied(column.concat(row - 2), true, board)) {
                     coord = column.concat(row - 2);
                     moves.push(coord);
                 }
@@ -133,13 +179,13 @@ var getMoves = (piece, pos) => {
             //check lower left and lower right diagonals
             if (c > 0 && row > 1) {
                 coord = columns[c-1].concat(row-1);
-                if (checkOccupied(coord, true)) {
+                if (checkOccupied(coord, true, board)) {
                     moves.push(coord);
                 }
             }
             if (c < 7 && row > 1) {
                 coord = columns[c+1].concat(row-1);
-                if (checkOccupied(coord, true)) {
+                if (checkOccupied(coord, true, board)) {
                     moves.push(coord);
                 }
             }
@@ -150,32 +196,44 @@ var getMoves = (piece, pos) => {
         //highlight along the columns
         for (let i = row+1; i < 9; i++) {
             coord = column.concat(i);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
-        for (let i = row-1; i > 1; i--) {
+        for (let i = row-1; i >= 1; i--) {
             coord = column.concat(i);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
         //highlight along the row
         for (let i = columns.indexOf(column)+1; i < 8; i++) {
             coord = columns[i].concat(row);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
-        for (let i = columns.indexOf(column)-1; i > 0; i--) {
+        for (let i = columns.indexOf(column)-1; i >= 0; i--) {
             coord = columns[i].concat(row);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
     }
 
@@ -219,7 +277,7 @@ var getMoves = (piece, pos) => {
             }
         }
 
-        moves = moves.filter((move) => !checkOccupied(move));
+        moves = moves.filter((move) => !checkOccupied(move, false, board));
     }
 
     else if (piece === 'bishop') {
@@ -230,10 +288,13 @@ var getMoves = (piece, pos) => {
         let j = row + 1;
         while(i >= 0 && j <= 8) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i--;
             j++;
         }
@@ -243,10 +304,13 @@ var getMoves = (piece, pos) => {
         j = row + 1;
         while(i <= 7 && j <= 8) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i++;
             j++;
         }
@@ -256,10 +320,13 @@ var getMoves = (piece, pos) => {
         j = row - 1;
         while(i >= 0 && j >= 1) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i--;
             j--;
         }
@@ -269,10 +336,13 @@ var getMoves = (piece, pos) => {
         j = row - 1;
         while(i <= 7 && j >= 1) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i++;
             j--;
         }
@@ -282,31 +352,43 @@ var getMoves = (piece, pos) => {
         //highlight along the columns
         for (let i = row+1; i < 9; i++) {
             coord = column.concat(i);
-            if (checkOccupied(coord)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
         for (let i = row-1; i > 1; i--) {
             coord = column.concat(i);
-            if (checkOccupied(coord)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
         for (let i = columns.indexOf(column)+1; i < 8; i++) {
             coord = columns[i].concat(row);
-            if (checkOccupied(coord)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
         for (let i = columns.indexOf(column)-1; i > 0; i--) {
             coord = columns[i].concat(row);
-            if (checkOccupied(coord)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
         }
 
         let c = columns.indexOf(column);
@@ -316,10 +398,13 @@ var getMoves = (piece, pos) => {
         let j = row + 1;
         while(i >= 0 && j <= 8) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i--;
             j++;
         }
@@ -329,10 +414,13 @@ var getMoves = (piece, pos) => {
         j = row + 1;
         while(i <= 7 && j <= 8) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i++;
             j++;
         }
@@ -342,10 +430,13 @@ var getMoves = (piece, pos) => {
         j = row - 1;
         while(i >= 0 && j >= 1) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i--;
             j--;
         }
@@ -355,10 +446,13 @@ var getMoves = (piece, pos) => {
         j = row - 1;
         while(i <= 7 && j >= 1) {
             coord = columns[i].concat(j);
-            if (checkOccupied(coord, activePlayer)) {
+            if (checkOccupied(coord, false, board)) {
                 break;
             }
             moves.push(coord);
+            if (checkOccupied(coord, true, board)) {
+                break;
+            }
             i++;
             j--;
         }
@@ -404,10 +498,10 @@ var getMoves = (piece, pos) => {
             moves.push(coord);
         }
 
-        moves = moves.filter((move) => !checkOccupied(move));
+        moves = moves.filter((move) => !checkOccupied(move, false, board));
+        console.log(moves);
     }
 
-    console.log(moves);
     return moves;
 }
 

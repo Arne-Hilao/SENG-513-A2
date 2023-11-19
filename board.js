@@ -134,15 +134,16 @@ var swapPlayers = () => {
     p2.innerHTML = t1;
 }
 
-var checkOccupied = (coord, pawn) => {
+var checkOccupied = (coord, opposing, gameBoard) => {
     //checks the board and returns true if the coordinate given has a piece on it
     let found = false;
-    for (const piece in board[activePlayer]) {
-        let arr = board[activePlayer][piece];
+    for (const piece in gameBoard[activePlayer]) {
+        let arr = gameBoard[activePlayer][piece];
         if (piece !== 'king') {
             for (let i = 0; i < arr.length; i++) {
                 if (arr[i] === coord) {
                     found = true;
+                    break;
                 }
             }
         }
@@ -151,41 +152,29 @@ var checkOccupied = (coord, pawn) => {
                 found = true;
             }
         }
+        if (found) {
+            break;
+        }
     }
-    if (pawn) {
+    if (opposing) {
         //check non activePlayer board as well
-        if (activePlayer === 'white') {
-            for (const piece in board.black) {
-                let arr = board.black[piece];
-                if (piece !== 'king') {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i] === coord) {
-                            found = true;
-                        }
-                    }
-                }
-                else {
-                    if (arr === coord) {
+        for (const piece in gameBoard[inactivePlayer]) {
+            let arr = gameBoard[inactivePlayer][piece];
+            if (piece !== 'king') {
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i] === coord) {
                         found = true;
+                        break;
                     }
                 }
             }
-        }
-        else {
-            for (const piece in board.white) {
-                let arr = board.white[piece];
-                if (piece !== 'king') {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i] === coord) {
-                            found = true;
-                        }
-                    }
+            else {
+                if (arr === coord) {
+                    found = true;
                 }
-                else {
-                    if (arr === coord) {
-                        found = true;
-                    }
-                }
+            }
+            if (found) {
+                break;
             }
         }
     }
