@@ -28,3 +28,6 @@ RULES:      - Players take their turns (starting with white) to move their piece
             - It can also happens when there are only two kings
 
 MECHANICS:  Players take turns to move their pieces. They may play without a timer, pressing play on the timer at the top of the screen, or without one. Players must first click the piece they wish to move, which will highlight the legal moves, and then click on one of the highlighted squares to move the piece there. Clicking on the piece selected, or clicking on a different piece cancels the selection.
+
+CHANGES:
+I decided to split up the files to make it easier to read, as well as add helper functions to make the code run more smoothly. Instead of my original design regarding state-checks, I decided to run checks through the classes that the board had, and handle logic concurrently with the click-handler
