@@ -57,6 +57,43 @@ var makeMove = (original, clicked, type) => {
 
         //if in check, look for valid moves
         //if none are found, declare winner
+        let pieces = board[activePlayer];
+        let posMoves = [];
+        //check pawn moves
+        for (let i = 0; i < pieces.pawn.length; i++) {
+            let tPos = getMoves('pawn', pieces.pawn[i]);
+            let filteredMoves = filterCheck(pieces.pawn[i], tPos, 'pawn');
+            posMoves = posMoves.concat(filteredMoves);
+        }
+        for (let i = 0; i < pieces.rook.length; i++) {
+            let tPos = getMoves('rook', pieces.rook[i]);
+            let filteredMoves = filterCheck(pieces.rook[i], tPos, 'rook');
+            posMoves = posMoves.concat(filteredMoves);
+        }
+        for (let i = 0; i < pieces.knight.length; i++) {
+            let tPos = getMoves('knight', pieces.knight[i]);
+            let filteredMoves = filterCheck(pieces.knight[i], tPos, 'knight');
+            posMoves = posMoves.concat(filteredMoves);
+        }
+        for (let i = 0; i < pieces.bishop.length; i++) {
+            let tPos = getMoves('bishop', pieces.bishop[i]);
+            let filteredMoves = filterCheck(pieces.bishop[i], tPos, 'bishop');
+            posMoves = posMoves.concat(filteredMoves);
+        }
+        for (let i = 0; i < pieces.queen.length; i++) {
+            let tPos = getMoves('queen', pieces.queen[i]);
+            let filteredMoves = filterCheck(pieces.queen[i], tPos, 'queen');
+            posMoves = posMoves.concat(filteredMoves);
+        }
+        //check king moves
+        let tPos = getMoves('king', pieces.king);
+        let filteredMoves = filterCheck(pieces.king, tPos, 'king');
+        posMoves = posMoves.concat(filteredMoves);
+        
+        if (posMoves.length < 1) {
+            //no possible moves. Checkmate
+            endGame(1);
+        }
     }
 }
 
@@ -65,38 +102,31 @@ var boardMove = (original, clicked, type, {white, black}) => {
     //add new item to clicked
 
     //remove clicked position from entire board
-    if (activePlayer === 'white') {
-        for (let p in white) {
-            if (p !== 'king') {
-                white[p] = white[p].filter((pos) => {
-                    return pos !== clicked;
-                })
-                black[p] = black[p].filter((pos) => {
-                    return pos !== clicked;
-                })
-            }
-        }
-    }
-    else {
-        for (let p in black) {
-            if (p !== 'king') {
-                black[p] = black[p].filter((pos) => {
-                    return pos !== clicked;
-                })
-                black[p] = black[p].filter((pos) => {
-                    return pos !== clicked;
-                })
-            }
-        }
-    }
-    
 
-    console.log('boardMove: ' + white);
+    for (let p in white) {
+        if (p !== 'king') {
+            white[p] = white[p].filter((pos) => {
+                return pos !== clicked;
+            })
+            black[p] = black[p].filter((pos) => {
+                return pos !== clicked;
+            })
+        }
+    }
+    for (let p in black) {
+        if (p !== 'king') {
+            black[p] = black[p].filter((pos) => {
+                return pos !== clicked;
+            })
+            black[p] = black[p].filter((pos) => {
+                return pos !== clicked;
+            })
+        }
+    }
 
     //place move piece
     if (activePlayer === 'white') {
         if (type === 'king') {
-            console.log('moving king');
             white[type] = clicked;
         }
         else {
@@ -499,7 +529,6 @@ var getMoves = (piece, pos) => {
         }
 
         moves = moves.filter((move) => !checkOccupied(move, false, board));
-        console.log(moves);
     }
 
     return moves;

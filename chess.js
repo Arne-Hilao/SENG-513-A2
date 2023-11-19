@@ -96,7 +96,6 @@ var clickHandler = (event) => {
 
         //get all possible moves
         let moves = getMoves(type, clicked);
-        console.log(moves);
 
         //fitler based off state (read: check)
         let filteredMoves = filterCheck(clicked, moves, type);
@@ -151,12 +150,10 @@ var filterCheck = (original, moves, piece) => {
     //using checkState();
     let curatedMoves = moves.filter((move) => {
         let tBoard = structuredClone(board);
-        console.log(tBoard);
         boardMove(original, move, piece, tBoard);
         return !checkState(tBoard);
     });
 
-    console.log(curatedMoves);
     return curatedMoves;
 }
 
@@ -223,14 +220,12 @@ var checkState = (boardObject) => {
         if (c > 0 && row < 8) {
             coord = columns[c-1].concat(row+1);
             if (boardObject[inactivePlayer].pawn.includes(coord)) {
-                console.log(coord + 'pawn');
                 found = true;
             }
         }
         if (c < 7 && row < 8) {
             coord = columns[c+1].concat(row+1);
             if (boardObject[inactivePlayer].pawn.includes(coord)) {
-                console.log(coord + 'pawn');
                 found = true;
             }
         }
@@ -240,14 +235,12 @@ var checkState = (boardObject) => {
         if (c > 0 && row > 1) {
             coord = columns[c-1].concat(row-1);
             if (boardObject[inactivePlayer].pawn.includes(coord)) {
-                console.log(coord + 'pawn');
                 found = true;
             }
         }
         if (c < 7 && row > 1) {
             coord = columns[c+1].concat(row-1);
             if (boardObject[inactivePlayer].pawn.includes(coord)) {
-                console.log(coord + 'pawn');
                 found = true;
             }
         }
@@ -264,7 +257,6 @@ var checkState = (boardObject) => {
             break;
         }
         else if (checkOccupied(coord, false, boardObject)) {
-            console.log('occupied');
             break;
         }
     }
@@ -381,34 +373,13 @@ var endGame = (arg) => {
     }
 
     else if (arg === 1) {
-        //ended in resignation or time-out.
+        //ended in resignation or time-out, or checkmate
         if (activePlayer === 'white') {
             if (whitePlayer === 0) {
                 p2Score += 1;
             }
             else {
                 p1Score += 1;
-            }
-        }
-        else {
-            if(whitePlayer === 0) {
-                p1Score += 1;
-            }
-            else {
-                p2Score += 1;
-            }
-        }
-    }
-
-    //if not, 
-    //add 1 to active player's score
-    else {
-        if (activePlayer === 'white') {
-            if (whitePlayer === 0) {
-                p1Score += 1;
-            }
-            else {
-                p2Score += 1;
             }
         }
         else {
