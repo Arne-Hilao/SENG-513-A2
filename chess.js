@@ -12,7 +12,13 @@ let columns = 'abcdefgh'
 let whitePlayer = 0;
 
 //sets the currently active player
-let activePlayer = 0;
+let activePlayer = 'white';
+
+let wKingMoved = false;
+let bKingMoved = false;
+
+let p1Score = 0;
+let p2Score = 0;
 
 //board object that the game will reference.
 const board = {
@@ -22,10 +28,11 @@ const board = {
     black: {}
 
     //format:
-    //e4: wp
-        //wp means 'white pawn'. First letter denotes color, second denotes piece
-        //w = white, b = black
-        //p = pawn, r = rook, n = knight, b = bishop, q = queen, k = king
+    //REVISED FORMAT:
+        //k : e1
+        //p : [a2, b2, ...]
+
+        //object property is the pieces, the values are their positions on the board
 };
 
 //=================TIMER FUNCTIONS=================
@@ -60,69 +67,72 @@ var setUpBoard = () => {
     //Set up the board. Move pieces back to their proper places.
     //revert the board state to empty
 
-    for (i = 0; i < 8; i++) {
-        for (j = 1; j < 9; j++) {
-            let coord = columns[i];
-            coord = coord.concat(j);
-            delete board.white[coord];
-            delete board.black[coord];
-        }    
-    }
+    board.white = {};
+    board.black = {};
+
+    let wPawns = [];
+    let bPawns = [];
 
     //set up the pawns
-    for (i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i++) {
         let coord = columns[i];
-        whiteCoord = coord.concat('2')
-        blackCoord = coord.concat('7')
-        board.white[whiteCoord] = 'p';
-        board.black[blackCoord] = 'p';
+        wCoord = coord.concat('2')
+        bCoord = coord.concat('7')
+        wPawns.push(wCoord);
+        bPawns.push(bCoord);
     }
 
+    board.white.pawn = wPawns;
+    board.black.pawn = bPawns;
+
     //setup the rooks
-    board.white.a1 = 'r';
-    board.white.h1 = 'r';
-    board.black.a8 = 'r';
-    board.black.h8 = 'r';
+    board.white.rook = ['a1', 'h1'];
+    board.black.rook = ['a8', 'h8'];
 
     //setup the knights
-    board.white.b1 = 'n';
-    board.white.g1 = 'n';
-    board.black.b8 = 'n';
-    board.black.g8 = 'n';
+    board.white.knight = ['b1', 'g1'];
+    board.black.knight = ['b8', 'g8'];
 
     //setup the bishops
-    board.white.c1 = 'b';
-    board.white.f1 = 'b';
-    board.black.c8 = 'b';
-    board.black.f8 = 'b';
+    board.white.bishop = ['c1', 'f1'];
+    board.black.bishop = ['c8', 'f8'];
 
     //setup the queens
-    board.white.d1 = 'q';
-    board.black.d8 = 'q';
+    board.white.queen = ['d1'];
+    board.black.queen = ['d8'];
 
     //setup the kings
-    board.white.e1 = 'k';
-    board.black.e8 = 'k';
+    board.white.king = 'e1';
+    board.black.king = 'e8';
 
-    //add event listeners to all boxes
+    //remove and add eventlisteners
     let boxes = document.querySelectorAll('.box');
     boxes.forEach((box) => {
+        box.removeEventListener('click', clickHandler);
         box.addEventListener('click', (event) => {
             clickHandler(event);
-        })
+        });
     })
+
+    //reset move list
+    document.getElementById('move_list').innerHTML = "";
+
+    //reset active player to white
+    document.getElementById('active_player').innerHTML = "ACTIVE PLAYER: WHITE"
+
+    updatePieces();
 }
 
 /**
- * Function updateBoard
+ * Function updatePieces
  * Input: None
  * 
- * Function that updates the visual representation of the board.
- * Called after every modification to the game state, such as selecting pieces, or making moves
+ * Function that updates the positions of the pieces.
+ * Called after every move that changs the pieces, such as moves and captures, or pawn promotion
  */
-var updateBoard = () => {
+var updatePieces = () => {
     //clear board
-    for (i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i++) {
         for (j = 1; j < 9; j++) {
             let column = columns[i];
             let coord = column.concat(j);
@@ -134,121 +144,168 @@ var updateBoard = () => {
         }
     }
 
-    let whiteCoords = [];
-    let blackCoords = [];
-    
-    for (var coord in board.white) {
-        whiteCoords.push(coord);
+    //set up pawns
+    for (let i = 0; i < board.white.pawn.length; i++) {
+        document.getElementById(board.white.pawn[i]).innerHTML = '<img src="./src/wp.png">';
     }
-    for (var coord in board.black) {
-        blackCoords.push(coord);
+    for (let i = 0; i < board.black.pawn.length; i++) {
+        document.getElementById(board.black.pawn[i]).innerHTML = '<img src="./src/bp.png">';
     }
 
-    while (whiteCoords?.length) {
-        //take every property in board.whiet and find the element id associated
-        let coord = whiteCoords.pop();
-        let piece = '<img ';
-        if (board.white[coord] === 'p') {
-            piece = piece.concat('src="./src/wp.png"');
-        }
-        else if (board.white[coord] === 'r'){
-            piece = piece.concat('src="./src/wr.png"');
-        }
-        else if (board.white[coord] === 'n'){
-            piece = piece.concat('src="./src/wn.png"');
-        }
-        else if (board.white[coord] === 'b'){
-            piece = piece.concat('src="./src/wb.png"');
-        }
-        else if (board.white[coord] === 'q'){
-            piece = piece.concat('src="./src/wq.png"');
-        }
-        else if (board.white[coord] === 'k'){
-            piece = piece.concat('src="./src/wk.png"');
-        }
-
-        piece = piece.concat('>');
-        document.getElementById(coord).innerHTML = piece;
+    //set up rooks
+    for (let i = 0; i < board.white.rook.length; i++) {
+        document.getElementById(board.white.rook[i]).innerHTML = '<img src="./src/wr.png">';
+    }
+    for (let i = 0; i < board.black.rook.length; i++) {
+        document.getElementById(board.black.rook[i]).innerHTML = '<img src="./src/br.png">';
     }
 
-    while (blackCoords?.length) {
-        //take every property in board.black and find the element id associated
-        let coord = blackCoords.pop();
-        let piece = '<img ';
-        if (board.black[coord] === 'p') {
-            piece = piece.concat('src="./src/bp.png"');
-        }
-        else if (board.black[coord] === 'r'){
-            piece = piece.concat('src="./src/br.png"');
-        }
-        else if (board.black[coord] === 'n'){
-            piece = piece.concat('src="./src/bn.png"');
-        }
-        else if (board.black[coord] === 'b'){
-            piece = piece.concat('src="./src/bb.png"');
-        }
-        else if (board.black[coord] === 'q'){
-            piece = piece.concat('src="./src/bq.png"');
-        }
-        else if (board.black[coord] === 'k'){
-            piece = piece.concat('src="./src/bk.png"');
-        }
-
-        piece = piece.concat('>');
-        document.getElementById(coord).innerHTML = piece;
+    //set up knights
+    for (let i = 0; i < board.white.knight.length; i++) {
+        document.getElementById(board.white.knight[i]).innerHTML = '<img src="./src/wn.png">';
     }
+    for (let i = 0; i < board.black.knight.length; i++) {
+        document.getElementById(board.black.knight[i]).innerHTML = '<img src="./src/bn.png">';
+    }
+
+    //set up bishops
+    for (let i = 0; i < board.white.bishop.length; i++) {
+        document.getElementById(board.white.bishop[i]).innerHTML = '<img src="./src/wb.png">';
+    }
+    for (let i = 0; i < board.black.bishop.length; i++) {
+        document.getElementById(board.black.bishop[i]).innerHTML = '<img src="./src/bb.png">';
+    }
+
+    //set up queens
+    for (let i = 0; i < board.white.queen.length; i++) {
+        document.getElementById(board.white.queen[i]).innerHTML = '<img src="./src/wq.png">';
+    }
+    for (let i = 0; i < board.black.queen.length; i++) {
+        document.getElementById(board.black.queen[i]).innerHTML = '<img src="./src/bq.png">';
+    }
+
+    //set up kings
+    document.getElementById(board.white.king).innerHTML = '<img src="./src/wk.png">';
+    document.getElementById(board.black.king).innerHTML = '<img src="./src/bk.png">';
 }
 
-//click listener. handles game logic
+//click listener for the board. handles game logic
 var clickHandler = (event) => {
-    let square, selected;
+    let clicked;
     if (event.target.nodeName === "IMG") {
         //clicking on a piece
         //get the id of the box it is in
-        square = event.target.parentNode.id;
+        clicked = event.target.parentNode.id;
     }
     else {
         //clicking on an empty square
-        square = event.target.id;
+        clicked = event.target.id;
     }
 
-    //check if a piece is already selected
-    for (i = 0; i < 8; i++) {
-        for (j = 1; j < 8; j++) {
-            let column = columns[i];
-            let coord = column.concat(j)
-            if (document.getElementById(coord).classList.contains('selected')) {
-                //a piece is selected
-                selected = true;
+    //get the selected square (if it exists)
+    //get the highlighted moves if they exist
+    let element = document.getElementById(clicked);
+    let selectedSquares = document.getElementsByClassName('selected');
+    let highlightedSquares = document.getElementsByClassName('highlighted');
+    let type = null;
+    let found = false;
+
+    //check type of square clicked
+    let classes = element.classList;
+
+    for (piece in board[activePlayer]) {
+        if (piece === 'king') {
+            if (board[activePlayer][piece] === clicked) {
+                found = true;
+                type = piece;
             }
         }
-    }
 
-    if (board.white.hasOwnProperty(square)) {
-        //white has it.
-        if (document.getElementById(square).classList.contains('selected')) {
-            //clicked element is already selected
-            document.getElementById(square).classList.remove('selected');
-            selected = false;
-        }
         else {
-            //clicked element is not selected
-            if (selected) {
-                document.getElementsByClassName('selected')[0].classList.remove('selected');
+            for (let i = 0; i < board[activePlayer][piece].length; i++) {
+                if (board[activePlayer][piece][i] === clicked) {
+                    type = piece;
+                    found = true;
+                    break;
+                }
             }
-            document.getElementById(square).classList.add('selected');
         }
+
+        if (found) {
+            break;
+        }
+    }
+
+    if (found && !classes.contains('selected')) {
+        //player is selecting a piece not actively selected
+        while(highlightedSquares.length > 0) {
+            highlightedSquares[0].classList.remove('highlighted');
+        }
+        if (selectedSquares.length > 0) {
+            selectedSquares[0].classList.remove('selected');
+        }
+
+        //get all possible moves
+        let moves = getMoves(type, clicked);
+
+        //fitler based off state (read: check)
+        moves = filterCheck(moves);
+
+        highlightMoves(moves);
+        element.classList.add('selected');
+        //select the selected piece
+    }
+    else if (classes.contains('highlighted')) {
+        //player is clicking a highlighted square => a legal move
+        
+        //get original piece
+        for (piece in board[activePlayer]) {
+            if (piece === 'king') {
+                if (board[activePlayer][piece] === selectedSquares[0].id) {
+                    type = piece;
+                }
+            }
+    
+            else {
+                for (let i = 0; i < board[activePlayer][piece].length; i++) {
+                    if (board[activePlayer][piece][i] === selectedSquares[0].id) {
+                        type = piece;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+    
+            if (found) {
+                break;
+            }
+        }
+
+        //start moving piece.
+        makeMove(selectedSquares[0].id, clicked, type);
     }
     else {
-        selected = false;
-        document.getElementsByClassName('selected')[0].classList.remove('selected');
+        //player is clicking an already selected piece, 
+        //or a non-consequential piece to movement
+        while(highlightedSquares.length > 0) {
+            highlightedSquares[0].classList.remove('highlighted');
+        }
+        if (selectedSquares.length > 0) {
+            selectedSquares[0].classList.remove('selected');
+        }
     }
 }
 
 //=================STATE/GAME FUNCTIONS=================
 
+var filterCheck = () => {
+    
+}
+
 var checkState = () => {
     //first, check if the active king is in check
+
+    //find the king's position in the active player's board
 
         //if so, check if there are any legal moves for the active player
             //if not, trigger win
@@ -258,53 +315,511 @@ var checkState = () => {
         //check if there are any legal moves for the active player
             //if not, trigger stalemate
             //if so, do nothing
-
-    //check the move list for the past few moves. If the past 50 are king moves, draw
 }
 
-var endGame = () => {
+var endGame = (arg) => {
     //check if argument is 0.
     //if zero, add 0.5 to both scores
+    if (arg === 0) {
+        p1Score, p2Score += 0.5;
+    }
+
+    else if (arg === 1) {
+        //ended in resignation or time-out.
+        if (activePlayer === 0) {
+            p1Score += 1;
+        }
+        else {
+            p1Score += 2;
+        }
+    }
 
     //if not, 
     //add 1 to active player's score
+    else {
+        if (activePlayer === 0) {
+            p1Score += 1;
+        }
+        else {
+            p1Score += 2;
+        }
+    }
 
     //then
     //set active player to white
+    
     //make whitePlayer be the inverse of its value
+}
+
+var checkOccupied = (coord, pawn) => {
+    //checks the board and returns true if the coordinate given has a piece on it
+    let found = false;
+    for (const piece in board[activePlayer]) {
+        let arr = board[activePlayer][piece];
+        if (piece !== 'king') {
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === coord) {
+                    found = true;
+                }
+            }
+        }
+        else {
+            if (arr === coord) {
+                found = true;
+            }
+        }
+    }
+    if (pawn) {
+        //check non activePlayer board as well
+        if (activePlayer === 'white') {
+            for (const piece in board.black) {
+                let arr = board.black[piece];
+                if (piece !== 'king') {
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === coord) {
+                            found = true;
+                        }
+                    }
+                }
+                else {
+                    if (arr === coord) {
+                        found = true;
+                    }
+                }
+            }
+        }
+        else {
+            for (const piece in board.white) {
+                let arr = board.white[piece];
+                if (piece !== 'king') {
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === coord) {
+                            found = true;
+                        }
+                    }
+                }
+                else {
+                    if (arr === coord) {
+                        found = true;
+                    }
+                }
+            }
+        }
+    }
+    return found;
 }
 
 //=================MOVE FUNCTIONS=================
 
-var getMoves = (i, j) => {
-    //Look at the indicated square
-    //check current active player's piece list
-    //if no piece is found, it's an invalid piece
+var makeMove = (original, clicked, type) => {
+    //add new item to clicked
+    console.log("Making move:\n original: " + original + "\n clicked: " + clicked + "\n type: " + type);
 
-    //if a piece is found, check board state.
-    //If board state doesn't return a check, 
-        //then return all possible moves for chosen piece
-    //If board state returns a check, check all possible moves for chosen piece,
-        //and return list of moves that prevent the check.
+    //remove clicked position from entire board
+    for (let p in board[activePlayer]) {
+        if (p !== 'king') {
+            board.white[p] = board.white[p].filter((pos) => {
+                return pos !== clicked;
+            })
+            board.black[p] = board.black[p].filter((pos) => {
+                return pos !== clicked;
+            })
+        }
+    }
 
-    //If move is legal, add to move list
+    //place moved piece
+    if (type === 'king') {
+        board[activePlayer][type] = clicked;
+    }
+    else {
+        board[activePlayer][type] = board[activePlayer][type].filter((pos) => {
+            return pos !== original;
+        })
+        board[activePlayer][type].push(clicked);
+    }
+
+    //remove old piece
+
+    //swap activePlayer
+    if (activePlayer === 'white') {
+        activePlayer = 'black';
+        document.getElementById('active_player').innerHTML = "ACTIVE PLAYER: BLACK"
+    }
+    else {
+        activePlayer = 'white';
+        document.getElementById('active_player').innerHTML = "ACTIVE PLAYER: WHITE"
+    }
+    
+    //update Move List
+    let ul = document.getElementById("move_list");
+    let li = document.createElement("li");
+    
+    if (type === 'rook') {
+        li.innerHTML = "R" + clicked;
+    }
+    else if (type === 'knight') {
+        li.innerHTML = "N" + clicked;
+    }
+    else if (type === 'bishop') {
+        li.innerHTML = "B" + clicked;
+    }
+    else if (type === 'queen') {
+        li.innerHTML = "Q" + clicked;
+    }
+    else if (type === 'king') {
+        li.innerHTML = "K" + clicked;
+    }
+    else {
+        li.innerHTML = clicked;
+    }
+    ul.appendChild(li);
+
+    //update board
+    updatePieces();
 }
 
-var boundCheck = (i, j) => {
-    //check if position (i, j) is in the board
+//gets an unfiltered set of moves
+var getMoves = (piece, pos) => {
+    //Look at the indicated square
+    let column = pos[0];
+    let row = Number(pos[1]);
+    let coord;
+    let moves = [];
+
+    //check current active player's piece list
+    //if no piece is found, it's an invalid piece
+    if (piece === undefined) {
+        return moves;
+    }
+    
+    //if a piece is found, return all possible moves
+    else if (piece === 'pawn') {
+        let c = columns.indexOf(column);
+        if (activePlayer === 'white') {
+            //only allow a pawn to move twice if it's on its starting square
+            if (!checkOccupied(column.concat(row + 1), true)) {
+                coord = column.concat(row + 1);
+                moves.push(coord);
+            }
+            if (row === 2) {
+                if (!checkOccupied(column.concat(row + 2), true)) {
+                    coord = column.concat(row + 2);
+                    moves.push(coord);
+                }
+            }
+
+            //check upper left and upper right diagonals
+            if (c > 0 && row < 8) {
+                coord = columns[c-1].concat(row+1);
+                if (checkOccupied(coord, true)) {
+                    moves.push(coord);
+                }
+            }
+            if (c < 7 && row < 8) {
+                coord = columns[c+1].concat(row+1);
+                if (checkOccupied(coord, true)) {
+                    moves.push(coord);
+                }
+            }
+        }
+        else {
+            //only allow a pawn to move twice if it's on its starting square
+            if (!checkOccupied(column.concat(row - 1), true)) {
+                coord = column.concat(row - 1);
+                moves.push(coord);
+            }
+            if (row === 7) {
+                if (!checkOccupied(column.concat(row - 2), true)) {
+                    coord = column.concat(row - 2);
+                    moves.push(coord);
+                }
+            }
+            //check lower left and lower right diagonals
+            if (c > 0 && row > 1) {
+                coord = columns[c-1].concat(row-1);
+                if (checkOccupied(coord, true)) {
+                    moves.push(coord);
+                }
+            }
+            if (c < 7 && row > 1) {
+                coord = columns[c+1].concat(row-1);
+                if (checkOccupied(coord, true)) {
+                    moves.push(coord);
+                }
+            }
+        }
+    }
+
+    else if (piece === 'rook') {
+        //highlight along the columns
+        for (let i = row+1; i < 9; i++) {
+            coord = column.concat(i);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+        }
+        for (let i = row-1; i > 1; i--) {
+            coord = column.concat(i);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+        }
+        //highlight along the row
+        for (let i = columns.indexOf(column)+1; i < 8; i++) {
+            coord = columns[i].concat(row);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+        }
+        for (let i = columns.indexOf(column)-1; i > 0; i--) {
+            coord = columns[i].concat(row);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+        }
+    }
+
+    else if (piece === 'knight') {
+        let c = columns.indexOf(column);
+
+        if (c < 6) {
+            coord = columns[c+2];
+            if (row < 8) {
+                moves.push(coord.concat(row + 1));
+            }
+            if (row > 1) {
+                moves.push(coord.concat(row - 1));
+            }
+        }
+        if (c > 1) {
+            coord = columns[c-2];
+            if (row < 8) {
+                moves.push(coord.concat(row + 1));
+            }
+            if (row > 1) {
+                moves.push(coord.concat(row - 1));
+            }
+        }
+        if (c < 7) {
+            coord = columns[c+1];
+            if (row < 7) {
+                moves.push(coord.concat(row + 2));
+            }
+            if (row > 2) {
+                moves.push(coord.concat(row - 2));
+            }
+        }
+        if (c > 0) {
+            coord = columns[c-1];
+            if (row < 7) {
+                moves.push(coord.concat(row + 2));
+            }
+            if (row > 2) {
+                moves.push(coord.concat(row - 2));
+            }
+        }
+
+        moves = moves.filter((move) => !checkOccupied(move));
+    }
+
+    else if (piece === 'bishop') {
+        let c = columns.indexOf(column);
+        //highlight along the diagonals
+        //top left
+        let i = c-1;
+        let j = row + 1;
+        while(i >= 0 && j <= 8) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i--;
+            j++;
+        }
+
+        //top right
+        i = c+1;
+        j = row + 1;
+        while(i <= 7 && j <= 8) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i++;
+            j++;
+        }
+
+        //bottom left
+        i = c-1;
+        j = row - 1;
+        while(i >= 0 && j >= 1) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i--;
+            j--;
+        }
+
+        //bottom right
+        i = c+1;
+        j = row - 1;
+        while(i <= 7 && j >= 1) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i++;
+            j--;
+        }
+    }
+
+    else if (piece === 'queen') {
+        //highlight along the columns
+        for (let i = row+1; i < 9; i++) {
+            coord = column.concat(i);
+            if (checkOccupied(coord)) {
+                break;
+            }
+            moves.push(coord);
+        }
+        for (let i = row-1; i > 1; i--) {
+            coord = column.concat(i);
+            if (checkOccupied(coord)) {
+                break;
+            }
+            moves.push(coord);
+        }
+        for (let i = columns.indexOf(column)+1; i < 8; i++) {
+            coord = columns[i].concat(row);
+            if (checkOccupied(coord)) {
+                break;
+            }
+            moves.push(coord);
+        }
+        for (let i = columns.indexOf(column)-1; i > 0; i--) {
+            coord = columns[i].concat(row);
+            if (checkOccupied(coord)) {
+                break;
+            }
+            moves.push(coord);
+        }
+
+        let c = columns.indexOf(column);
+        //highlight along the diagonals
+        //top left
+        let i = c-1;
+        let j = row + 1;
+        while(i >= 0 && j <= 8) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i--;
+            j++;
+        }
+
+        //top right
+        i = c+1;
+        j = row + 1;
+        while(i <= 7 && j <= 8) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i++;
+            j++;
+        }
+
+        //bottom left
+        i = c-1;
+        j = row - 1;
+        while(i >= 0 && j >= 1) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i--;
+            j--;
+        }
+
+        //bottom right
+        i = c+1;
+        j = row - 1;
+        while(i <= 7 && j >= 1) {
+            coord = columns[i].concat(j);
+            if (checkOccupied(coord, activePlayer)) {
+                break;
+            }
+            moves.push(coord);
+            i++;
+            j--;
+        }
+    }
+
+    else if (piece === 'king') {
+        let c = columns.indexOf(column);
+        //check column
+        if (row < 8) {
+            coord = columns[c].concat(row + 1);
+            moves.push(coord);
+        }
+        if (row > 1) {
+            coord = columns[c].concat(row - 1);
+            moves.push(coord);
+        }
+
+        //check row
+        if (c > 0) {
+            coord = columns[c-1].concat(row);
+            moves.push(coord);
+        }
+        if (c < 7) {
+            coord = columns[c+1].concat(row);
+            moves.push(coord);
+        }
+
+        //check diagonals
+        if (c > 0 && row < 8) {
+            coord = columns[c-1].concat(row+1);
+            moves.push(coord);
+        }
+        if (c < 7 && row < 8) {
+            coord = columns[c+1].concat(row+1);
+            moves.push(coord);
+        }
+        if (c > 0 && row > 1) {
+            coord = columns[c-1].concat(row-1);
+            moves.push(coord);
+        }
+        if (c < 7 && row > 1) {
+            coord = columns[c+1].concat(row-1);
+            moves.push(coord);
+        }
+
+        moves = moves.filter((move) => !checkOccupied(move));
+    }
+
+    console.log(moves);
+    return moves;
 }
 
 var highlightMoves = ( moveArray ) => {
     //highlight the squares for the moves given
-}
-
-var addToList = (activePlayer) => {
-    //add move to the move list
-
-    //if the activePlayer is white, add a new entry on move
-
-    //if the activePlayer is black, take the previous move entry, and append ' | (move)'
+    for (var move in moveArray) {
+        document.getElementById(moveArray[move]).classList.add('highlighted');
+    }
 }
 
 window.onload = setUpBoard();
-window.onload = updateBoard();
