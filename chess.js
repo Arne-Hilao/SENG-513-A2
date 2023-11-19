@@ -169,31 +169,57 @@ var checkState = () => {
             //if so, do nothing
 }
 
+var updateScore = () => {
+    document.getElementById('p1Score').innerHTML = p1Score;
+    document.getElementById('p2Score').innerHTML = p2Score;
+}
+
 var endGame = (arg) => {
     //check if argument is 0.
     //if zero, add 0.5 to both scores
     if (arg === 0) {
-        p1Score, p2Score += 0.5;
+        p1Score += 0.5;
+        p2Score += 0.5;
     }
 
     else if (arg === 1) {
         //ended in resignation or time-out.
-        if (activePlayer === 0) {
-            p1Score += 1;
+        if (activePlayer === 'white') {
+            if (whitePlayer === 0) {
+                p2Score += 1;
+            }
+            else {
+                p1Score += 1;
+            }
         }
         else {
-            p1Score += 2;
+            if(whitePlayer === 0) {
+                p1Score += 1;
+            }
+            else {
+                p2Score += 1;
+            }
         }
     }
 
     //if not, 
     //add 1 to active player's score
     else {
-        if (activePlayer === 0) {
-            p1Score += 1;
+        if (activePlayer === 'white') {
+            if (whitePlayer === 0) {
+                p1Score += 1;
+            }
+            else {
+                p2Score += 1;
+            }
         }
         else {
-            p1Score += 2;
+            if(whitePlayer === 0) {
+                p1Score += 1;
+            }
+            else {
+                p2Score += 1;
+            }
         }
     }
 
@@ -211,66 +237,24 @@ var endGame = (arg) => {
 
     //reset board
     setUpBoard();
+    swapPlayers();
+    updateScore();
 }
-
-var checkOccupied = (coord, pawn) => {
-    //checks the board and returns true if the coordinate given has a piece on it
-    let found = false;
-    for (const piece in board[activePlayer]) {
-        let arr = board[activePlayer][piece];
-        if (piece !== 'king') {
-            for (let i = 0; i < arr.length; i++) {
-                if (arr[i] === coord) {
-                    found = true;
-                }
-            }
-        }
-        else {
-            if (arr === coord) {
-                found = true;
-            }
-        }
-    }
-    if (pawn) {
-        //check non activePlayer board as well
-        if (activePlayer === 'white') {
-            for (const piece in board.black) {
-                let arr = board.black[piece];
-                if (piece !== 'king') {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i] === coord) {
-                            found = true;
-                        }
-                    }
-                }
-                else {
-                    if (arr === coord) {
-                        found = true;
-                    }
-                }
-            }
-        }
-        else {
-            for (const piece in board.white) {
-                let arr = board.white[piece];
-                if (piece !== 'king') {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i] === coord) {
-                            found = true;
-                        }
-                    }
-                }
-                else {
-                    if (arr === coord) {
-                        found = true;
-                    }
-                }
-            }
-        }
-    }
-    return found;
-}
-
-
 
 window.onload = setUpBoard();
+
+//remove and add eventlisteners
+let boxes = document.querySelectorAll('.box');
+boxes.forEach((box) => {
+    box.removeEventListener('click', clickHandler);
+    box.addEventListener('click', (event) => {
+        clickHandler(event);
+    });
+})
+
+document.getElementById('draw').addEventListener('click', function() {
+    endGame(0);
+});
+document.getElementById('resign').addEventListener('click', function() {
+    endGame(1);
+});

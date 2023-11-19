@@ -48,21 +48,13 @@ var setUpBoard = () => {
     board.white.king = 'e1';
     board.black.king = 'e8';
 
-    //remove and add eventlisteners
-    let boxes = document.querySelectorAll('.box');
-    boxes.forEach((box) => {
-        box.removeEventListener('click', clickHandler);
-        box.addEventListener('click', (event) => {
-            clickHandler(event);
-        });
-    })
-
     //reset move list
     document.getElementById('move_list').innerHTML = "";
 
     //reset active player to white
     document.getElementById('active_player').innerHTML = "ACTIVE PLAYER: WHITE"
 
+    updateScore();
     updatePieces();
 }
 
@@ -130,4 +122,72 @@ var updatePieces = () => {
     //set up kings
     document.getElementById(board.white.king).innerHTML = '<img src="./src/wk.png">';
     document.getElementById(board.black.king).innerHTML = '<img src="./src/bk.png">';
+}
+
+var swapPlayers = () => {
+    let p1 = document.getElementById('player1');
+    let p2 = document.getElementById('player2');
+
+    let t1 = p1.innerHTML;
+
+    p1.innerHTML = p2.innerHTML;
+    p2.innerHTML = t1;
+}
+
+var checkOccupied = (coord, pawn) => {
+    //checks the board and returns true if the coordinate given has a piece on it
+    let found = false;
+    for (const piece in board[activePlayer]) {
+        let arr = board[activePlayer][piece];
+        if (piece !== 'king') {
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === coord) {
+                    found = true;
+                }
+            }
+        }
+        else {
+            if (arr === coord) {
+                found = true;
+            }
+        }
+    }
+    if (pawn) {
+        //check non activePlayer board as well
+        if (activePlayer === 'white') {
+            for (const piece in board.black) {
+                let arr = board.black[piece];
+                if (piece !== 'king') {
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === coord) {
+                            found = true;
+                        }
+                    }
+                }
+                else {
+                    if (arr === coord) {
+                        found = true;
+                    }
+                }
+            }
+        }
+        else {
+            for (const piece in board.white) {
+                let arr = board.white[piece];
+                if (piece !== 'king') {
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === coord) {
+                            found = true;
+                        }
+                    }
+                }
+                else {
+                    if (arr === coord) {
+                        found = true;
+                    }
+                }
+            }
+        }
+    }
+    return found;
 }
